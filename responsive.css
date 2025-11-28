@@ -1,0 +1,384 @@
+/* Responsive Design Styles */
+
+/* Large Desktop Screens (1200px and up) */
+@media (min-width: 1200px) {
+    .container-fluid {
+        max-width: 1140px;
+        margin: 0 auto;
+    }
+    
+    .bottom-nav {
+        left: auto;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 80px;
+        height: auto;
+        flex-direction: column;
+        border-top: none;
+        border-right: 1px solid var(--glass-border);
+        border-left: 1px solid var(--glass-border);
+        border-radius: var(--border-radius) 0 0 var(--border-radius);
+        padding: 1rem 0.5rem;
+    }
+    
+    .nav-item {
+        flex: 0 0 auto;
+        margin-bottom: 1rem;
+        padding: 1rem 0.5rem;
+    }
+    
+    .nav-item:last-child {
+        margin-bottom: 0;
+    }
+    
+    .nav-item span {
+        font-size: 0.7rem;
+        margin-top: 0.25rem;
+    }
+    
+    .app-main {
+        padding-right: 100px; /* Space for sidebar nav */
+    }
+    
+    .fab-btn {
+        right: 100px;
+        bottom: 2rem;
+    }
+}
+
+/* Tablets and Small Desktops (768px to 1199px) */
+@media (min-width: 768px) and (max-width: 1199px) {
+    .features-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .stat-card h3 {
+        font-size: 1.5rem;
+    }
+    
+    .welcome-text {
+        font-size: 1.75rem;
+    }
+}
+
+/* Mobile Devices (767px and down) */
+@media (max-width: 767px) {
+    /* Landing Page Mobile */
+    .landing-container {
+        padding: 1rem 0.5rem;
+    }
+    
+    .landing-content {
+        padding: 1rem 0;
+        text-align: center;
+    }
+    
+    .features-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+    
+    .logo-section h1 {
+        font-size: 2.5rem;
+    }
+    
+    /* Auth Pages Mobile */
+    .auth-background {
+        padding: 1rem 0.5rem;
+    }
+    
+    .back-home {
+        position: relative;
+        top: 0;
+        left: 0;
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+    
+    .auth-card {
+        margin: 0 0.5rem;
+    }
+    
+    /* App Layout Mobile */
+    .app-header {
+        padding: 0.75rem 0;
+    }
+    
+    .app-main {
+        padding: 1rem 0.5rem;
+    }
+    
+    .container-fluid {
+        padding: 0 0.5rem;
+    }
+    
+    /* Stats Grid Mobile */
+    .row.mb-4 .col-md-3 {
+        margin-bottom: 0.75rem;
+    }
+    
+    .stat-card {
+        padding: 1rem 0.5rem;
+    }
+    
+    .stat-card h3 {
+        font-size: 1.25rem;
+        margin: 0.5rem 0 0.25rem;
+    }
+    
+    .stat-card p {
+        font-size: 0.75rem;
+    }
+    
+    /* Welcome Section Mobile */
+    .welcome-card {
+        padding: 1rem;
+    }
+    
+    .welcome-text {
+        font-size: 1.25rem;
+    }
+    
+    .date-display {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+    
+    /* Cards Mobile */
+    .glass-card {
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    /* Bottom Navigation Mobile */
+    .bottom-nav {
+        padding: 0.5rem 0.25rem;
+    }
+    
+    .nav-item {
+        padding: 0.5rem 0.25rem;
+        font-size: 0.7rem;
+    }
+    
+    .nav-item i {
+        font-size: 1.1rem;
+        margin-bottom: 0.125rem;
+    }
+    
+    /* FAB Button Mobile */
+    .fab-btn {
+        width: 50px;
+        height: 50px;
+        bottom: 70px;
+        right: 1rem;
+        font-size: 1.25rem;
+    }
+    
+    /* Modal Mobile */
+    .modal-dialog {
+        margin: 0.5rem;
+    }
+    
+    .glass-modal .modal-body {
+        padding: 1rem;
+    }
+    
+    /* Forms Mobile */
+    .form-control, .form-select {
+        font-size: 16px; /* Prevent zoom on iOS */
+    }
+    
+    /* Button Groups Mobile */
+    .action-buttons {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+    
+    .btn-sm {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.875rem;
+    }
+    
+    /* Lists Mobile */
+    .expense-item, .emi-item, .category-item {
+        padding: 0.75rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .expense-amount, .emi-amount {
+        align-self: flex-end;
+        margin-top: -2rem;
+    }
+    
+    /* Charts Mobile */
+    .chart-container {
+        height: 150px;
+    }
+    
+    /* Filter Groups Mobile */
+    .filter-group {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.25rem;
+    }
+    
+    .filter-group .form-select {
+        width: 100%;
+        min-width: auto;
+    }
+    
+    /* Text Sizes Mobile */
+    h1 { font-size: 1.75rem; }
+    h2 { font-size: 1.5rem; }
+    h3 { font-size: 1.25rem; }
+    h4 { font-size: 1.1rem; }
+    h5 { font-size: 1rem; }
+    
+    .display-4 { font-size: 2rem; }
+}
+
+/* Very Small Mobile Devices (480px and down) */
+@media (max-width: 480px) {
+    .row.mb-4 .col-6 {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-card {
+        text-align: left;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .stat-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
+    
+    .stat-card h3 {
+        margin: 0 0 0.25rem;
+    }
+    
+    .welcome-text {
+        font-size: 1.1rem;
+    }
+    
+    .nav-item span {
+        display: none;
+    }
+    
+    .nav-item i {
+        margin-bottom: 0;
+        font-size: 1.25rem;
+    }
+    
+    .bottom-nav {
+        padding: 0.5rem;
+    }
+    
+    .nav-item {
+        padding: 0.5rem;
+    }
+}
+
+/* Landscape Mobile Optimization */
+@media (max-height: 600px) and (orientation: landscape) {
+    .auth-background {
+        padding: 1rem 0.5rem;
+        align-items: flex-start;
+    }
+    
+    .auth-card {
+        margin-top: 2rem;
+    }
+    
+    .landing-container {
+        padding: 1rem 0.5rem;
+    }
+    
+    .app-main {
+        padding: 0.5rem 0;
+    }
+    
+    .bottom-nav {
+        padding: 0.25rem 0.5rem;
+    }
+}
+
+/* High DPI Screens */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .glass-card {
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+    }
+}
+
+/* Print Styles */
+@media print {
+    .bottom-nav,
+    .fab-btn,
+    .app-header .dropdown,
+    .global-loader {
+        display: none !important;
+    }
+    
+    body {
+        background: white !important;
+        color: black !important;
+    }
+    
+    .glass-card {
+        background: white !important;
+        border: 1px solid #ddd !important;
+        box-shadow: none !important;
+        backdrop-filter: none !important;
+    }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    
+    .page-enter {
+        animation: none;
+        opacity: 1;
+    }
+}
+
+/* Dark Mode Support (additional) */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --light: #f8fafc;
+        --dark: #1e293b;
+        --darker: #0f172a;
+    }
+}
+
+/* Touch Device Optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .btn:hover,
+    .glass-card:hover,
+    .nav-item:hover,
+    .fab-btn:hover {
+        transform: none;
+    }
+    
+    .expense-item:hover,
+    .emi-item:hover {
+        transform: none;
+        background: rgba(255, 255, 255, 0.05);
+    }
+}
