@@ -1,18 +1,18 @@
 // UI Utility Functions
 
 // Global loader control
-export function showGlobalLoader() {
+function showGlobalLoader() {
     const loader = document.getElementById('globalLoader');
     if (loader) loader.style.display = 'flex';
 }
 
-export function hideGlobalLoader() {
+function hideGlobalLoader() {
     const loader = document.getElementById('globalLoader');
     if (loader) loader.style.display = 'none';
 }
 
 // Format currency
-export function formatCurrency(amount, currency = 'USD') {
+function formatCurrency(amount, currency = 'USD') {
     return new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: currency
@@ -20,7 +20,7 @@ export function formatCurrency(amount, currency = 'USD') {
 }
 
 // Format date
-export function formatDate(dateString) {
+function formatDate(dateString) {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
         weekday: 'short',
@@ -30,13 +30,13 @@ export function formatDate(dateString) {
 }
 
 // Format date for input fields
-export function formatDateForInput(dateString) {
+function formatDateForInput(dateString) {
     const date = new Date(dateString);
     return date.toISOString().split('T')[0];
 }
 
 // Get greeting based on time of day
-export function getTimeGreeting() {
+function getTimeGreeting() {
     const hour = new Date().getHours();
     if (hour < 12) return 'Morning';
     if (hour < 17) return 'Afternoon';
@@ -44,7 +44,7 @@ export function getTimeGreeting() {
 }
 
 // Show notification
-export function showNotification(message, type = 'info') {
+function showNotification(message, type = 'info') {
     // Create notification element
     const notification = document.createElement('div');
     notification.className = `alert alert-${type} notification`;
@@ -74,7 +74,7 @@ export function showNotification(message, type = 'info') {
 }
 
 // Debounce function for search inputs
-export function debounce(func, wait) {
+function debounce(func, wait) {
     let timeout;
     return function executedFunction(...args) {
         const later = () => {
@@ -87,7 +87,7 @@ export function debounce(func, wait) {
 }
 
 // Initialize date-related UI elements
-export function initializeDateUI() {
+function initializeDateUI() {
     // Set current date in date inputs
     const dateInputs = document.querySelectorAll('input[type="date"]');
     dateInputs.forEach(input => {
@@ -115,7 +115,7 @@ export function initializeDateUI() {
 }
 
 // Category color mapping
-export const categoryColors = {
+const categoryColors = {
     'Food': '#f59e0b',
     'Transport': '#3b82f6',
     'Shopping': '#8b5cf6',
@@ -126,7 +126,7 @@ export const categoryColors = {
 };
 
 // Category icons mapping
-export const categoryIcons = {
+const categoryIcons = {
     'Food': 'fas fa-utensils',
     'Transport': 'fas fa-car',
     'Shopping': 'fas fa-shopping-bag',
@@ -172,17 +172,3 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
-
-// Export utility functions for other modules
-export default {
-    showGlobalLoader,
-    hideGlobalLoader,
-    formatCurrency,
-    formatDate,
-    formatDateForInput,
-    getTimeGreeting,
-    showNotification,
-    debounce,
-    categoryColors,
-    categoryIcons
-};
