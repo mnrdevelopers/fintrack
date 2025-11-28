@@ -754,14 +754,12 @@ textarea.form-control {
     color: var(--accent-red);
 }
 
+/* MODIFIED: Removed gradient text for better readability and 'static' look */
 .stat-card h3 {
     font-size: 1.875rem;
     font-weight: 700;
     margin: 0.5rem 0;
-    background: linear-gradient(135deg, var(--white), #e2e8f0);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--white); /* Replaces gradient */
 }
 
 .stat-card p {
@@ -818,7 +816,7 @@ textarea.form-control {
     border-radius: var(--radius-md);
     border-left: 4px solid var(--primary);
     transition: all 0.3s ease;
-    animation: fadeInUp 0.5s ease-out;
+    /* animation: fadeInUp 0.5s ease-out; Removed */
 }
 
 .expense-item:hover, .emi-item:hover {
@@ -946,10 +944,7 @@ textarea.form-control {
     font-size: 1.5rem;
     font-weight: 700;
     margin: 0;
-    background: linear-gradient(135deg, var(--white), #e2e8f0);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--white); /* Removed gradient */
 }
 
 .summary-card p {
@@ -975,14 +970,13 @@ textarea.form-control {
     color: var(--primary);
 }
 
-/* Skeleton Loaders */
+/* Skeleton Loaders - MODIFIED: Removed shimmer animation */
 .skeleton-text {
-    background: linear-gradient(90deg, var(--dark-gray) 25%, var(--medium-gray) 50%, var(--dark-gray) 75%);
-    background-size: 200% 100%;
-    animation: shimmer 2s infinite;
+    background: var(--medium-gray); /* Static color instead of gradient */
     border-radius: 4px;
     color: transparent !important;
     display: inline-block;
+    opacity: 0.3;
 }
 
 .skeleton-item, .skeleton-expense, .skeleton-emi, .skeleton-category {
@@ -992,18 +986,10 @@ textarea.form-control {
     margin-bottom: 1rem;
     position: relative;
     overflow: hidden;
+    opacity: 0.5;
 }
 
-.skeleton-item::before, .skeleton-expense::before, .skeleton-emi::before, .skeleton-category::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-    animation: shimmer 1.5s infinite;
-}
+/* Removed the ::before shimmer animations */
 
 .skeleton-chart {
     height: 200px;
@@ -1011,18 +997,9 @@ textarea.form-control {
     border-radius: var(--radius-md);
     position: relative;
     overflow: hidden;
+    opacity: 0.5;
 }
 
-.skeleton-chart::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-    animation: shimmer 1.5s infinite;
-}
 
 /* Empty States */
 .empty-state {
@@ -1074,52 +1051,6 @@ textarea.form-control {
     }
 }
 
-@keyframes bounce {
-    0%, 20%, 53%, 80%, 100% {
-        transform: translate3d(0,0,0);
-    }
-    40%, 43% {
-        transform: translate3d(0,-8px,0);
-    }
-    70% {
-        transform: translate3d(0,-4px,0);
-    }
-    90% {
-        transform: translate3d(0,-2px,0);
-    }
-}
-
-@keyframes scaleIn {
-    from {
-        opacity: 0;
-        transform: scale(0.9);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
-@keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateY(100%);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes glow {
-    0%, 100% {
-        box-shadow: 0 0 5px rgba(37, 99, 235, 0.5);
-    }
-    50% {
-        box-shadow: 0 0 20px rgba(37, 99, 235, 0.8);
-    }
-}
-
 @keyframes rotate {
     from {
         transform: rotate(0deg);
@@ -1129,9 +1060,9 @@ textarea.form-control {
     }
 }
 
-/* Page Enter Animations */
+/* Page Enter Animations - MODIFIED: Removed animation */
 .page-enter {
-    animation: fadeInUp 0.6s ease-out;
+    /* animation: fadeInUp 0.6s ease-out; */
 }
 
 /* Button Loading States */
