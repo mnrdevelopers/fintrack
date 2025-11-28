@@ -1,19 +1,9 @@
-import { auth, db } from './firebaseConfig.js';
-import { 
-    collection, 
-    getDocs, 
-    query, 
-    where, 
-    orderBy 
-} from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
-import { formatCurrency, showNotification, categoryColors } from './ui.js';
-
 let expenses = [];
 let currentPeriod = 'current-month';
 
 // Initialize reports page
-export async function initializeReports() {
-    if (!auth.currentUser) return;
+async function initializeReports() {
+    if (!firebase.auth().currentUser) return;
     
     try {
         await loadExpenses();
@@ -27,12 +17,14 @@ export async function initializeReports() {
 
 // Load expenses for reports
 async function loadExpenses() {
-    const expensesQuery = query(
-        collection(db, 'users', auth.currentUser.uid, 'expenses'),
-        orderBy('date', 'desc')
-    );
+    const user = firebase.auth().currentUser;
+    const expensesQuery = firebase.firestore()
+        .collection('users')
+        .doc(user.uid)
+        .collection('expenses')
+        .orderBy('date', 'desc');
     
-    const querySnapshot = await getDocs(expensesQuery);
+    const querySnapshot = await expensesQuery.get();
     expenses = [];
     
     querySnapshot.forEach((doc) => {
@@ -299,19 +291,21 @@ function setupEventListeners() {
 }
 
 // Get category statistics for dashboard
-export async function getCategoryStats() {
-    if (!auth.currentUser) return {};
+async function getCategoryStats() {
+    if (!firebase.auth().currentUser) return {};
     
     try {
         const now = new Date();
         const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+        const user = firebase.auth().currentUser;
         
-        const expensesQuery = query(
-            collection(db, 'users', auth.currentUser.uid, 'expenses'),
-            where('date', '>=', monthStart.toISOString().split('T')[0])
-        );
+        const expensesQuery = firebase.firestore()
+            .collection('users')
+            .doc(user.uid)
+            .collection('expenses')
+            .where('date', '>=', monthStart.toISOString().split('T')[0]);
         
-        const querySnapshot = await getDocs(expensesQuery);
+        const querySnapshot = await expensesQuery.get();
         const categoryTotals = {};
         let totalSpent = 0;
         
@@ -340,7 +334,7 @@ export async function getCategoryStats() {
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-    if (auth.currentUser && window.location.pathname.includes('reports.html')) {
+    if (firebase.auth().currentUser && window.location.pathname.includes('reports.html')) {
         initializeReports();
     }
 });
