@@ -34,17 +34,26 @@ async function loadExpenses() {
         .collection('expenses')
         .orderBy('date', 'desc');
     
-    const querySnapshot = await q.get();
-    expenses = [];
-    
-    querySnapshot.forEach((doc) => {
-        expenses.push({
-            id: doc.id,
-            ...doc.data()
+    // Use onSnapshot for real-time updates (better UX)
+    firebase.firestore()
+        .collection('users')
+        .doc(user.uid)
+        .collection('expenses')
+        .orderBy('date', 'desc')
+        .onSnapshot(querySnapshot => {
+            expenses = [];
+            querySnapshot.forEach((doc) => {
+                expenses.push({
+                    id: doc.id,
+                    ...doc.data()
+                });
+            });
+            renderExpenses();
+            updateSummary();
+        }, error => {
+            console.error('Error listening to expenses:', error);
+            showNotification('Error loading real-time expenses', 'danger');
         });
-    });
-    
-    renderExpenses();
 }
 
 // Render expenses list
@@ -91,6 +100,8 @@ function renderExpenses() {
     
     // Add delete event listeners
     document.querySelectorAll('.delete-expense').forEach(button => {
+        // Remove existing listener to prevent stacking if renderExpenses runs multiple times
+        button.removeEventListener('click', handleDeleteExpense); 
         button.addEventListener('click', handleDeleteExpense);
     });
 }
@@ -100,7 +111,13 @@ async function handleDeleteExpense(e) {
     const expenseId = e.currentTarget.getAttribute('data-id');
     const expenseItem = document.querySelector(`.expense-item[data-id="${expenseId}"]`);
     
-    if (!confirm('Are you sure you want to delete this expense?')) {
+    // CRITICAL FIX: Replace native confirm() with custom modal
+    const confirmed = await showConfirmModal(
+        'This will permanently delete the expense record. Are you sure?', 
+        'Delete Expense'
+    );
+    
+    if (!confirmed) {
         return;
     }
     
@@ -120,12 +137,7 @@ async function handleDeleteExpense(e) {
             .doc(expenseId)
             .delete();
         
-        // Remove from local array
-        expenses = expenses.filter(expense => expense.id !== expenseId);
-        
-        // Re-render
-        renderExpenses();
-        updateSummary();
+        // Local array and render will be updated by the onSnapshot listener
         
         showNotification('Expense deleted successfully', 'success');
     } catch (error) {
@@ -138,26 +150,23 @@ async function handleDeleteExpense(e) {
 async function addExpense(expenseData) {
     try {
         const user = firebase.auth().currentUser;
-        const docRef = await firebase.firestore()
+        
+        // Validate amount is a number
+        const amount = parseFloat(expenseData.amount);
+
+        await firebase.firestore()
             .collection('users')
             .doc(user.uid)
             .collection('expenses')
             .add({
-                ...expenseData,
-                amount: parseFloat(expenseData.amount),
+                amount: amount,
+                category: expenseData.category,
+                note: expenseData.note,
                 date: expenseData.date,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
         
-        // Add to local array
-        expenses.unshift({
-            id: docRef.id,
-            ...expenseData,
-            amount: parseFloat(expenseData.amount)
-        });
-        
-        renderExpenses();
-        updateSummary();
+        // Local array and render will be updated by the onSnapshot listener
         
         showNotification('Expense added successfully', 'success');
         return true;
@@ -202,40 +211,15 @@ function setupEventListeners() {
     // Add expense form
     const addExpenseForm = document.getElementById('addExpenseForm');
     if (addExpenseForm) {
-        addExpenseForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const saveBtn = document.getElementById('saveExpenseBtn');
-            const modal = bootstrap.Modal.getInstance(document.getElementById('addExpenseModal'));
-            
-            saveBtn.classList.add('btn-loading');
-            
-            const formData = new FormData(addExpenseForm);
-            const expenseData = {
-                amount: formData.get('amount'),
-                category: formData.get('category'),
-                note: formData.get('note'),
-                date: formData.get('date')
-            };
-            
-            const success = await addExpense(expenseData);
-            
-            saveBtn.classList.remove('btn-loading');
-            
-            if (success) {
-                addExpenseForm.reset();
-                modal.hide();
-            }
-        });
+        addExpenseForm.removeEventListener('submit', handleAddExpenseSubmit); // Prevent double listeners
+        addExpenseForm.addEventListener('submit', handleAddExpenseSubmit);
     }
     
     // Category filter
     const categoryFilter = document.getElementById('categoryFilter');
     if (categoryFilter) {
-        categoryFilter.addEventListener('change', (e) => {
-            currentFilter = e.target.value;
-            renderExpenses();
-        });
+        categoryFilter.removeEventListener('change', handleCategoryFilterChange); // Prevent double listeners
+        categoryFilter.addEventListener('change', handleCategoryFilterChange);
     }
     
     // Modal show event - reset form
@@ -244,8 +228,43 @@ function setupEventListeners() {
         expenseModal.addEventListener('show.bs.modal', () => {
             const form = document.getElementById('addExpenseForm');
             if (form) form.reset();
+            // Set date to today by default
+            const dateInput = document.getElementById('expenseDate');
+            if (dateInput) dateInput.value = formatDateForInput(new Date());
         });
     }
+}
+
+async function handleAddExpenseSubmit(e) {
+    e.preventDefault();
+    
+    const addExpenseForm = e.currentTarget;
+    const saveBtn = document.getElementById('saveExpenseBtn');
+    const modal = bootstrap.Modal.getInstance(document.getElementById('addExpenseModal'));
+    
+    saveBtn.classList.add('btn-loading');
+    
+    const formData = new FormData(addExpenseForm);
+    const expenseData = {
+        amount: formData.get('amount'),
+        category: formData.get('category'),
+        note: formData.get('note'),
+        date: formData.get('date')
+    };
+    
+    const success = await addExpense(expenseData);
+    
+    saveBtn.classList.remove('btn-loading');
+    
+    if (success) {
+        addExpenseForm.reset();
+        modal.hide();
+    }
+}
+
+function handleCategoryFilterChange(e) {
+    currentFilter = e.target.value;
+    renderExpenses();
 }
 
 // Get expenses for dashboard
@@ -288,6 +307,7 @@ async function getSpendingStats() {
     
     try {
         const user = firebase.auth().currentUser;
+        // Query expenses from the start of the current month
         const expensesQuery = firebase.firestore()
             .collection('users')
             .doc(user.uid)
@@ -302,7 +322,11 @@ async function getSpendingStats() {
             const expense = doc.data();
             const expenseDate = new Date(expense.date);
             
-            if (expenseDate >= today) {
+            // Check if expense date is today (by converting to year/month/day string)
+            const expenseDateString = expense.date; // already YYYY-MM-DD
+            const todayDateString = today.toISOString().split('T')[0];
+            
+            if (expenseDateString === todayDateString) {
                 todaySpent += expense.amount;
             }
             
@@ -318,7 +342,13 @@ async function getSpendingStats() {
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-    if (firebase.auth().currentUser && (window.location.pathname.includes('expenses.html') || window.location.pathname.includes('dashboard.html'))) {
-        initializeExpenses();
+    // Only initialize if the user is authenticated and the current page is an expense-related page
+    if (window.location.pathname.includes('expenses.html') || window.location.pathname.includes('dashboard.html')) {
+        // Wait for Firebase auth state to ensure user is logged in before initializing
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                initializeExpenses();
+            }
+        });
     }
 });
