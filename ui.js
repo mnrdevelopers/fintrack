@@ -236,10 +236,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     initializeDateUI();
     
-    const animatedElements = document.querySelectorAll('.page-enter');
-    animatedElements.forEach((element, index) => {
-        element.style.animationDelay = `${index * 0.1}s`;
-    });
+    // REMOVED: Page entry animation stagger logic
+    // The previous loop that added 'animationDelay' to elements has been removed
+    // to stop the cards from animating in one by one.
     
     const navItems = document.querySelectorAll('.nav-item');
     navItems.forEach(item => {
