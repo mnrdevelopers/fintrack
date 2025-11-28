@@ -1,5 +1,19 @@
 // UI Utility Functions
 
+// App Settings State
+const appSettings = {
+    currency: 'USD',
+    locale: 'en-US'
+};
+
+// Currency Configuration Map
+const currencyMap = {
+    'USD': { locale: 'en-US', symbol: '$', label: 'USD ($)', flag: '🇺🇸' },
+    'INR': { locale: 'en-IN', symbol: '₹', label: 'INR (₹)', flag: '🇮🇳' },
+    'EUR': { locale: 'de-DE', symbol: '€', label: 'EUR (€)', flag: '🇪🇺' },
+    'GBP': { locale: 'en-GB', symbol: '£', label: 'GBP (£)', flag: '🇬🇧' }
+};
+
 // Global loader control
 function showGlobalLoader() {
     const loader = document.getElementById('globalLoader');
@@ -11,12 +25,59 @@ function hideGlobalLoader() {
     if (loader) loader.style.display = 'none';
 }
 
-// Format currency
-function formatCurrency(amount, currency = 'USD') {
-    return new Intl.NumberFormat('en-US', {
+// Format currency based on App Settings
+function formatCurrency(amount) {
+    return new Intl.NumberFormat(appSettings.locale, {
         style: 'currency',
-        currency: currency
+        currency: appSettings.currency
     }).format(amount);
+}
+
+// Update App Currency State and UI
+function updateAppCurrency(currencyCode) {
+    if (currencyMap[currencyCode]) {
+        appSettings.currency = currencyCode;
+        appSettings.locale = currencyMap[currencyCode].locale;
+        
+        // Update the dropdown button text if it exists
+        const currencyLabel = document.getElementById('currentCurrencyLabel');
+        if (currencyLabel) {
+            currencyLabel.innerHTML = `${currencyMap[currencyCode].flag} ${currencyCode}`;
+        }
+        
+        // Update active state in dropdown
+        document.querySelectorAll('.currency-item').forEach(item => {
+            item.classList.remove('active');
+            if (item.dataset.currency === currencyCode) {
+                item.classList.add('active');
+            }
+        });
+    }
+}
+
+// Change Currency (User Action)
+async function changeCurrency(currencyCode) {
+    if (!currencyMap[currencyCode]) return;
+    
+    // 1. Update State
+    updateAppCurrency(currencyCode);
+    
+    // 2. Save to Firestore
+    const user = firebase.auth().currentUser;
+    if (user) {
+        try {
+            await firebase.firestore().collection('users').doc(user.uid).update({
+                currency: currencyCode
+            });
+            
+            // 3. Reload page to refresh all charts and lists with new currency
+            showGlobalLoader();
+            window.location.reload();
+        } catch (error) {
+            console.error('Error saving currency preference:', error);
+            showNotification('Failed to save currency preference', 'danger');
+        }
+    }
 }
 
 // Format date
@@ -45,12 +106,10 @@ function getTimeGreeting() {
 
 // Show notification
 function showNotification(message, type = 'info') {
-    // Create notification element
     const notification = document.createElement('div');
     notification.className = `alert alert-${type} notification`;
     notification.textContent = message;
     
-    // Add styles
     notification.style.cssText = `
         position: fixed;
         top: 20px;
@@ -64,9 +123,7 @@ function showNotification(message, type = 'info') {
     
     document.body.appendChild(notification);
     
-    // Remove after 3 seconds
     setTimeout(() => {
-        // Use the defined slideOutRight animation
         notification.style.animation = 'slideOutRight 0.3s ease forwards';
         setTimeout(() => {
             if (notification.parentNode) {
@@ -76,7 +133,7 @@ function showNotification(message, type = 'info') {
     }, 3000);
 }
 
-// CRITICAL FIX: Custom Confirmation Modal Utility
+// Custom Confirmation Modal Utility
 function showConfirmModal(message, confirmText = 'Delete') {
     return new Promise(resolve => {
         const modalElement = document.getElementById('confirmationModal');
@@ -85,30 +142,26 @@ function showConfirmModal(message, confirmText = 'Delete') {
         
         if (!modalElement || !modalMessage || !confirmBtn) {
             console.error("Confirmation modal elements not found. Defaulting to true.");
-            resolve(true); // Fallback in case HTML is missing
+            resolve(true);
             return;
         }
 
         modalMessage.textContent = message;
         confirmBtn.textContent = confirmText;
 
-        // Ensure we remove previous listeners to prevent multiple calls
         const newConfirmBtn = confirmBtn.cloneNode(true);
         confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
         
         const modal = new bootstrap.Modal(modalElement);
         modal.show();
 
-        // Listener for the confirm button
         newConfirmBtn.addEventListener('click', function handler() {
             modal.hide();
             resolve(true);
             newConfirmBtn.removeEventListener('click', handler);
         });
 
-        // Listener for modal close (cancel)
         modalElement.addEventListener('hidden.bs.modal', function handler() {
-            // Check if the promise has already been resolved by the confirm button
             if (newConfirmBtn.parentNode) {
                 resolve(false);
             }
@@ -117,8 +170,6 @@ function showConfirmModal(message, confirmText = 'Delete') {
     });
 }
 
-
-// Debounce function for search inputs
 function debounce(func, wait) {
     let timeout;
     return function executedFunction(...args) {
@@ -131,9 +182,7 @@ function debounce(func, wait) {
     };
 }
 
-// Initialize date-related UI elements
 function initializeDateUI() {
-    // Set current date in date inputs
     const dateInputs = document.querySelectorAll('input[type="date"]');
     dateInputs.forEach(input => {
         if (!input.value) {
@@ -141,7 +190,6 @@ function initializeDateUI() {
         }
     });
     
-    // Update current date display
     const dateDisplay = document.getElementById('currentDate');
     if (dateDisplay) {
         dateDisplay.textContent = new Date().toLocaleDateString('en-US', {
@@ -152,14 +200,12 @@ function initializeDateUI() {
         });
     }
     
-    // Update time greeting
     const timeGreeting = document.getElementById('timeGreeting');
     if (timeGreeting) {
         timeGreeting.textContent = getTimeGreeting();
     }
 }
 
-// Category color mapping
 const categoryColors = {
     'Food': '#f59e0b',
     'Transport': '#3b82f6',
@@ -170,7 +216,6 @@ const categoryColors = {
     'Other': '#6b7280'
 };
 
-// Category icons mapping
 const categoryIcons = {
     'Food': 'fas fa-utensils',
     'Transport': 'fas fa-car',
@@ -181,23 +226,19 @@ const categoryIcons = {
     'Other': 'fas fa-circle'
 };
 
-// Initialize page
+// Initialize page and Currency Listener
 document.addEventListener('DOMContentLoaded', function() {
-    // Hide global loader after page load
     setTimeout(() => {
         hideGlobalLoader();
     }, 1000);
     
-    // Initialize date-related UI
     initializeDateUI();
     
-    // Add animation to page elements
     const animatedElements = document.querySelectorAll('.page-enter');
     animatedElements.forEach((element, index) => {
         element.style.animationDelay = `${index * 0.1}s`;
     });
     
-    // Handle bottom navigation active state
     const navItems = document.querySelectorAll('.nav-item');
     navItems.forEach(item => {
         item.addEventListener('click', function() {
@@ -206,16 +247,39 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Handle form submissions
     const forms = document.querySelectorAll('form');
     forms.forEach(form => {
         form.addEventListener('submit', function(e) {
             const submitBtn = this.querySelector('button[type="submit"]');
             if (submitBtn) {
-                // Remove existing loading class to ensure the new one takes effect
                 submitBtn.classList.remove('btn-loading'); 
                 submitBtn.classList.add('btn-loading');
             }
         });
+    });
+
+    // Listen for currency selection clicks
+    document.querySelectorAll('.currency-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            const currency = e.currentTarget.dataset.currency;
+            changeCurrency(currency);
+        });
+    });
+
+    // Load User Preference on Startup
+    firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+            firebase.firestore().collection('users').doc(user.uid).get()
+                .then((doc) => {
+                    if (doc.exists && doc.data().currency) {
+                        updateAppCurrency(doc.data().currency);
+                        // Refresh active page parts if needed, but the basic formatCurrency calls
+                        // inside render functions (expenses.js etc) will use the new settings 
+                        // when they run.
+                    }
+                })
+                .catch((error) => console.log("Error loading user settings:", error));
+        }
     });
 });
