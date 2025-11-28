@@ -289,4 +289,34 @@ export async function getSpendingStats() {
     try {
         const expensesQuery = query(
             collection(db, 'users', auth.currentUser.uid, 'expenses'),
-            where('
+            where('date', '>=', monthStart.toISOString().split('T')[0])
+        );
+        
+        const querySnapshot = await getDocs(expensesQuery);
+        let todaySpent = 0;
+        let monthSpent = 0;
+        
+        querySnapshot.forEach((doc) => {
+            const expense = doc.data();
+            const expenseDate = new Date(expense.date);
+            
+            if (expenseDate >= today) {
+                todaySpent += expense.amount;
+            }
+            
+            monthSpent += expense.amount;
+        });
+        
+        return { today: todaySpent, month: monthSpent };
+    } catch (error) {
+        console.error('Error getting spending stats:', error);
+        return { today: 0, month: 0 };
+    }
+}
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    if (auth.currentUser && (window.location.pathname.includes('expenses.html') || window.location.pathname.includes('dashboard.html'))) {
+        initializeExpenses();
+    }
+});
