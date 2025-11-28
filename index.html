@@ -6,17 +6,9 @@
     <title>FinTrack - Smart Finance Management</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="index.css">
 </head>
 <body class="landing-page">
-    <div id="globalLoader" class="global-loader">
-        <div class="loader-content">
-            <div class="loader-spinner"></div>
-            <h3 class="loader-text mt-4">FinTrack</h3>
-            <p class="loader-subtext">Your Smart Finance Companion</p>
-        </div>
-    </div>
-
     <div class="container-fluid landing-container">
         <div class="row min-vh-100 align-items-center">
             <div class="col-lg-6">
@@ -34,14 +26,14 @@
                             <p>Track every expense with smart categorization</p>
                         </div>
                         <div class="feature-card">
+                            <i class="fas fa-rupee-sign feature-icon"></i>
+                            <h4>Income Management</h4>
+                            <p>Monitor your income sources efficiently</p>
+                        </div>
+                        <div class="feature-card">
                             <i class="fas fa-calendar-alt feature-icon"></i>
                             <h4>EMI Management</h4>
                             <p>Never miss an EMI payment again</p>
-                        </div>
-                        <div class="feature-card">
-                            <i class="fas fa-chart-pie feature-icon"></i>
-                            <h4>Smart Reports</h4>
-                            <p>Visual insights into your spending habits</p>
                         </div>
                     </div>
                 </div>
@@ -49,32 +41,32 @@
             
             <div class="col-lg-6">
                 <div class="auth-section">
-                    <div class="auth-card glass-card">
-                        <h2 class="text-center mb-4">Get Started</h2>
-                        <p class="text-center text-muted mb-4">Join thousands managing their finances smarter</p>
+                    <div class="glass-card">
+                        <h2 class="text-center mb-4 text-white">Get Started</h2>
+                        <p class="text-center text-light mb-4">Join thousands managing their finances smarter</p>
                         
                         <div class="d-grid gap-3">
-                            <a href="signup.html" class="btn btn-primary btn-lg">
+                            <a href="auth.html#signup" class="btn btn-primary btn-lg">
                                 <i class="fas fa-user-plus me-2"></i>Create Account
                             </a>
-                            <a href="login.html" class="btn btn-outline-light btn-lg">
+                            <a href="auth.html#login" class="btn btn-outline-light btn-lg">
                                 <i class="fas fa-sign-in-alt me-2"></i>Sign In
                             </a>
                         </div>
                         
-                        <div class="stats-section mt-5">
+                        <div class="stats-section mt-5 border-top border-secondary pt-4">
                             <div class="row text-center">
                                 <div class="col-4">
                                     <h4 class="text-white">10K+</h4>
-                                    <small class="text-muted">Users</small>
+                                    <small class="text-light">Users</small>
                                 </div>
                                 <div class="col-4">
                                     <h4 class="text-white">₹5M+</h4>
-                                    <small class="text-muted">Tracked</small>
+                                    <small class="text-light">Tracked</small>
                                 </div>
                                 <div class="col-4">
                                     <h4 class="text-white">4.8★</h4>
-                                    <small class="text-muted">Rating</small>
+                                    <small class="text-light">Rating</small>
                                 </div>
                             </div>
                         </div>
@@ -83,20 +75,5 @@
             </div>
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    <script src="firebaseConfig.js"></script>
-    <script src="ui.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(() => {
-                const loader = document.getElementById('globalLoader');
-                if (loader) loader.style.display = 'none';
-            }, 1500);
-        });
-    </script>
 </body>
 </html>
