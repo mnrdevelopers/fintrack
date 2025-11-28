@@ -1,23 +1,9 @@
-import { auth, db } from './firebaseConfig.js';
-import { 
-    collection, 
-    addDoc, 
-    updateDoc, 
-    deleteDoc, 
-    doc, 
-    getDocs, 
-    query, 
-    where, 
-    orderBy 
-} from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
-import { formatCurrency, formatDate, showNotification } from './ui.js';
-
 let emis = [];
 let currentStatusFilter = 'all';
 
 // Initialize EMIs page
-export async function initializeEMIs() {
-    if (!auth.currentUser) return;
+async function initializeEMIs() {
+    if (!firebase.auth().currentUser) return;
     
     try {
         await loadEMIs();
@@ -41,12 +27,14 @@ async function loadEMIs() {
         <div class="skeleton-emi"></div>
     `;
     
-    const q = query(
-        collection(db, 'users', auth.currentUser.uid, 'emis'),
-        orderBy('startDate', 'desc')
-    );
+    const user = firebase.auth().currentUser;
+    const q = firebase.firestore()
+        .collection('users')
+        .doc(user.uid)
+        .collection('emis')
+        .orderBy('startDate', 'desc');
     
-    const querySnapshot = await getDocs(q);
+    const querySnapshot = await q.get();
     emis = [];
     
     querySnapshot.forEach((doc) => {
@@ -165,11 +153,17 @@ async function handleMarkPaid(e) {
     
     try {
         const newPaidMonths = emi.paidMonths + 1;
+        const user = firebase.auth().currentUser;
         
         // Update in Firestore
-        await updateDoc(doc(db, 'users', auth.currentUser.uid, 'emis', emiId), {
-            paidMonths: newPaidMonths
-        });
+        await firebase.firestore()
+            .collection('users')
+            .doc(user.uid)
+            .collection('emis')
+            .doc(emiId)
+            .update({
+                paidMonths: newPaidMonths
+            });
         
         // Update local array
         emi.paidMonths = newPaidMonths;
@@ -201,8 +195,14 @@ async function handleDeleteEMI(e) {
         // Wait for animation to complete
         await new Promise(resolve => setTimeout(resolve, 300));
         
+        const user = firebase.auth().currentUser;
         // Delete from Firestore
-        await deleteDoc(doc(db, 'users', auth.currentUser.uid, 'emis', emiId));
+        await firebase.firestore()
+            .collection('users')
+            .doc(user.uid)
+            .collection('emis')
+            .doc(emiId)
+            .delete();
         
         // Remove from local array
         emis = emis.filter(emi => emi.id !== emiId);
@@ -221,15 +221,20 @@ async function handleDeleteEMI(e) {
 // Add new EMI
 async function addEMI(emiData) {
     try {
-        const docRef = await addDoc(collection(db, 'users', auth.currentUser.uid, 'emis'), {
-            ...emiData,
-            monthlyAmount: parseFloat(emiData.monthlyAmount),
-            totalMonths: parseInt(emiData.totalMonths),
-            paidMonths: parseInt(emiData.paidMonths) || 0,
-            dueDate: parseInt(emiData.dueDate),
-            startDate: emiData.startDate,
-            createdAt: new Date()
-        });
+        const user = firebase.auth().currentUser;
+        const docRef = await firebase.firestore()
+            .collection('users')
+            .doc(user.uid)
+            .collection('emis')
+            .add({
+                ...emiData,
+                monthlyAmount: parseFloat(emiData.monthlyAmount),
+                totalMonths: parseInt(emiData.totalMonths),
+                paidMonths: parseInt(emiData.paidMonths) || 0,
+                dueDate: parseInt(emiData.dueDate),
+                startDate: emiData.startDate,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
         
         // Add to local array
         emis.unshift({
@@ -335,16 +340,18 @@ function setupEventListeners() {
 }
 
 // Get upcoming EMIs for dashboard
-export async function getUpcomingEMIs(limit = 3) {
-    if (!auth.currentUser) return [];
+async function getUpcomingEMIs(limit = 3) {
+    if (!firebase.auth().currentUser) return [];
     
     try {
-        const q = query(
-            collection(db, 'users', auth.currentUser.uid, 'emis'),
-            where('paidMonths', '<', 'totalMonths')
-        );
+        const user = firebase.auth().currentUser;
+        const q = firebase.firestore()
+            .collection('users')
+            .doc(user.uid)
+            .collection('emis')
+            .where('paidMonths', '<', 'totalMonths');
         
-        const querySnapshot = await getDocs(q);
+        const querySnapshot = await q.get();
         const upcomingEMIs = [];
         
         querySnapshot.forEach((doc) => {
@@ -371,14 +378,14 @@ export async function getUpcomingEMIs(limit = 3) {
 }
 
 // Get next EMI due for dashboard
-export async function getNextEMIDue() {
+async function getNextEMIDue() {
     const upcomingEMIs = await getUpcomingEMIs(1);
     return upcomingEMIs.length > 0 ? upcomingEMIs[0] : null;
 }
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-    if (auth.currentUser && (window.location.pathname.includes('emis.html') || window.location.pathname.includes('dashboard.html'))) {
+    if (firebase.auth().currentUser && (window.location.pathname.includes('emis.html') || window.location.pathname.includes('dashboard.html'))) {
         initializeEMIs();
     }
 });
