@@ -45,13 +45,13 @@ async function signupUser(email, password, fullName) {
             displayName: fullName
         });
         
-        // Create user document in Firestore
+        // Create user document in Firestore with DEFAULT CURRENCY
         await firebase.firestore().collection('users').doc(user.uid).set({
             email: user.email,
             displayName: fullName,
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),
             monthlyBudget: 0,
-            currency: 'USD'
+            currency: 'USD' // Default currency
         });
         
         return { success: true, user };
