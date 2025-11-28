@@ -9,6 +9,7 @@ async function initializeEMIs() {
         await loadEMIs();
         setupEventListeners();
         updateEMISummary();
+        updateDashboardEMIs();
     } catch (error) {
         console.error('Error initializing EMIs:', error);
         showNotification('Error loading EMIs', 'danger');
@@ -18,23 +19,16 @@ async function initializeEMIs() {
 // Load EMIs from Firestore
 async function loadEMIs() {
     const emiList = document.getElementById('emiList');
-    if (!emiList) return;
-    
-    // Show skeleton loaders
-    emiList.innerHTML = `
-        <div class="skeleton-emi"></div>
-        <div class="skeleton-emi"></div>
-        <div class="skeleton-emi"></div>
-    `;
+    if (emiList) {
+        emiList.innerHTML = `
+            <div class="skeleton-emi"></div>
+            <div class="skeleton-emi"></div>
+            <div class="skeleton-emi"></div>
+        `;
+    }
     
     const user = firebase.auth().currentUser;
-    const q = firebase.firestore()
-        .collection('users')
-        .doc(user.uid)
-        .collection('emis')
-        .orderBy('startDate', 'desc');
-    
-    // Use onSnapshot for real-time updates (better UX)
+    // Use onSnapshot for real-time updates
     firebase.firestore()
         .collection('users')
         .doc(user.uid)
@@ -50,6 +44,7 @@ async function loadEMIs() {
             });
             renderEMIs();
             updateEMISummary();
+            updateDashboardEMIs();
         }, error => {
             console.error('Error listening to EMIs:', error);
             showNotification('Error loading real-time EMIs', 'danger');
@@ -118,7 +113,6 @@ function renderEMIs() {
         `;
     }).join('');
     
-    // Add event listeners
     document.querySelectorAll('.mark-paid').forEach(button => {
         button.addEventListener('click', handleMarkPaid);
     });
@@ -144,7 +138,6 @@ function getNextDueDate(emi) {
 // Get due status for styling
 function getDueStatus(dueDate) {
     const today = new Date();
-    // Ensure both dates are only compared by day (ignore time)
     const due = new Date(dueDate);
     due.setHours(0, 0, 0, 0);
     today.setHours(0, 0, 0, 0);
@@ -153,7 +146,7 @@ function getDueStatus(dueDate) {
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     
     if (diffDays < 0) return 'overdue';
-    if (diffDays <= 7) return 'due-soon'; // 7 days is a better threshold for "due soon"
+    if (diffDays <= 7) return 'due-soon';
     return '';
 }
 
@@ -164,7 +157,6 @@ async function handleMarkPaid(e) {
     
     if (!emi) return;
 
-    // Use a custom confirmation modal before proceeding
     const confirmed = await showConfirmModal(
         `Mark "${emi.title}" for ${formatCurrency(emi.monthlyAmount)} as paid?`, 
         'Mark Paid'
@@ -178,7 +170,6 @@ async function handleMarkPaid(e) {
         const newPaidMonths = emi.paidMonths + 1;
         const user = firebase.auth().currentUser;
         
-        // Update in Firestore
         await firebase.firestore()
             .collection('users')
             .doc(user.uid)
@@ -187,8 +178,6 @@ async function handleMarkPaid(e) {
             .update({
                 paidMonths: newPaidMonths
             });
-        
-        // Local array and render will be updated by the onSnapshot listener
         
         showNotification('EMI marked as paid', 'success');
     } catch (error) {
@@ -202,7 +191,6 @@ async function handleDeleteEMI(e) {
     const emiId = e.currentTarget.getAttribute('data-id');
     const emiItem = document.querySelector(`.emi-item[data-id="${emiId}"]`);
 
-    // CRITICAL FIX: Replace native confirm() with custom modal
     const confirmed = await showConfirmModal(
         'This will permanently delete the EMI record. Are you sure?', 
         'Delete EMI'
@@ -213,22 +201,16 @@ async function handleDeleteEMI(e) {
     }
     
     try {
-        // Add removing animation
         emiItem.classList.add('removing');
-        
-        // Wait for animation to complete
         await new Promise(resolve => setTimeout(resolve, 300));
         
         const user = firebase.auth().currentUser;
-        // Delete from Firestore
         await firebase.firestore()
             .collection('users')
             .doc(user.uid)
             .collection('emis')
             .doc(emiId)
             .delete();
-        
-        // Local array and render will be updated by the onSnapshot listener
         
         showNotification('EMI deleted successfully', 'success');
     } catch (error) {
@@ -241,8 +223,6 @@ async function handleDeleteEMI(e) {
 async function addEMI(emiData) {
     try {
         const user = firebase.auth().currentUser;
-        
-        // Validate EMI amounts/months are numbers
         const monthlyAmount = parseFloat(emiData.monthlyAmount);
         const totalMonths = parseInt(emiData.totalMonths);
         const paidMonths = parseInt(emiData.paidMonths) || 0;
@@ -262,8 +242,6 @@ async function addEMI(emiData) {
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
         
-        // Local array and render will be updated by the onSnapshot listener
-        
         showNotification('EMI added successfully', 'success');
         return true;
     } catch (error) {
@@ -273,7 +251,7 @@ async function addEMI(emiData) {
     }
 }
 
-// Update EMI summary statistics
+// Update EMI summary statistics (EMIs Page)
 function updateEMISummary() {
     const activeEMIs = emis.filter(emi => emi.paidMonths < emi.totalMonths);
     const monthlyTotal = activeEMIs.reduce((sum, emi) => sum + emi.monthlyAmount, 0);
@@ -284,7 +262,6 @@ function updateEMISummary() {
         return getDueStatus(nextDue) === 'due-soon' || getDueStatus(nextDue) === 'overdue';
     }).length;
     
-    // Update DOM elements
     const activeElement = document.getElementById('activeEMIs');
     const monthlyElement = document.getElementById('monthlyEMI');
     const dueElement = document.getElementById('dueSoon');
@@ -294,30 +271,69 @@ function updateEMISummary() {
     if (dueElement) dueElement.textContent = dueSoonCount;
 }
 
+// Update Dashboard EMI Stats
+async function updateDashboardEMIs() {
+    const nextEMIEl = document.getElementById('nextEMI');
+    const upcomingListEl = document.getElementById('upcomingEMIs');
+
+    if (!nextEMIEl && !upcomingListEl) return;
+
+    // Get next single EMI for the stat card
+    if (nextEMIEl) {
+        const nextEMI = await getNextEMIDue();
+        if (nextEMI) {
+            nextEMIEl.textContent = formatCurrency(nextEMI.monthlyAmount);
+        } else {
+            nextEMIEl.textContent = '--';
+        }
+    }
+
+    // Get list for upcoming section
+    if (upcomingListEl) {
+        const upcomingEMIs = await getUpcomingEMIs(3);
+        if (upcomingEMIs.length === 0) {
+            upcomingListEl.innerHTML = '<div class="text-muted text-center py-3">No upcoming EMIs</div>';
+        } else {
+            upcomingListEl.innerHTML = upcomingEMIs.map(emi => {
+                 return `
+                    <div class="emi-item ${emi.dueStatus}">
+                        <div class="emi-info">
+                            <div class="emi-title">
+                                <i class="fas fa-credit-card me-2"></i>
+                                ${emi.title}
+                            </div>
+                            <div class="emi-details">Due ${formatDate(emi.nextDue)}</div>
+                        </div>
+                        <div class="emi-amount">
+                            ${formatCurrency(emi.monthlyAmount)}
+                        </div>
+                    </div>
+                 `;
+            }).join('');
+        }
+    }
+}
+
 // Setup event listeners
 function setupEventListeners() {
-    // Add EMI form
     const addEMIForm = document.getElementById('addEMIForm');
     if (addEMIForm) {
-        addEMIForm.removeEventListener('submit', handleAddEMISubmit); // Prevent double listeners
+        addEMIForm.removeEventListener('submit', handleAddEMISubmit);
         addEMIForm.addEventListener('submit', handleAddEMISubmit);
     }
     
-    // Status filter
     const statusFilter = document.getElementById('statusFilter');
     if (statusFilter) {
-        statusFilter.removeEventListener('change', handleStatusFilterChange); // Prevent double listeners
+        statusFilter.removeEventListener('change', handleStatusFilterChange);
         statusFilter.addEventListener('change', handleStatusFilterChange);
     }
     
-    // Modal show event - reset form and set default dates
     const emiModal = document.getElementById('addEMIModal');
     if (emiModal) {
         emiModal.addEventListener('show.bs.modal', () => {
             const form = document.getElementById('addEMIForm');
             if (form) {
                 form.reset();
-                // Set default start date to today
                 const startDateInput = document.getElementById('emiStartDate');
                 if (startDateInput) {
                     startDateInput.value = new Date().toISOString().split('T')[0];
@@ -329,7 +345,6 @@ function setupEventListeners() {
 
 async function handleAddEMISubmit(e) {
     e.preventDefault();
-    
     const addEMIForm = e.currentTarget;
     const saveBtn = document.getElementById('saveEMIBtn');
     const modal = bootstrap.Modal.getInstance(document.getElementById('addEMIModal'));
@@ -347,7 +362,6 @@ async function handleAddEMISubmit(e) {
     };
     
     const success = await addEMI(emiData);
-    
     saveBtn.classList.remove('btn-loading');
     
     if (success) {
@@ -368,7 +382,6 @@ async function getUpcomingEMIs(limit = 3) {
     
     try {
         const user = firebase.auth().currentUser;
-        // Fetch all non-completed EMIs and do the sorting/limiting client-side
         const q = firebase.firestore()
             .collection('users')
             .doc(user.uid)
@@ -383,16 +396,14 @@ async function getUpcomingEMIs(limit = 3) {
                 ...doc.data()
             };
 
-            if (emi.paidMonths >= emi.totalMonths) return; // Skip completed
+            if (emi.paidMonths >= emi.totalMonths) return; 
 
-            // Calculate next due date
             emi.nextDue = getNextDueDate(emi);
             emi.dueStatus = getDueStatus(emi.nextDue);
             
             upcomingEMIs.push(emi);
         });
         
-        // Sort by due date and limit
         return upcomingEMIs
             .sort((a, b) => new Date(a.nextDue) - new Date(b.nextDue))
             .slice(0, limit);
@@ -402,17 +413,22 @@ async function getUpcomingEMIs(limit = 3) {
     }
 }
 
-// Get next EMI due for dashboard
 async function getNextEMIDue() {
     const upcomingEMIs = await getUpcomingEMIs(1);
     return upcomingEMIs.length > 0 ? upcomingEMIs[0] : null;
 }
 
+// Listen for global currency updates from UI.js
+window.addEventListener('currency-updated', () => {
+    // Re-render EMIs with new currency
+    renderEMIs();
+    updateEMISummary();
+    updateDashboardEMIs();
+});
+
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-    // Only initialize if the user is authenticated and the current page is an EMI-related page
     if (window.location.pathname.includes('emis.html') || window.location.pathname.includes('dashboard.html')) {
-        // Wait for Firebase auth state to ensure user is logged in before initializing
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
                 initializeEMIs();
