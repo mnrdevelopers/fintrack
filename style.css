@@ -20,6 +20,12 @@
     --light: #f8fafc;
     --white: #ffffff;
     
+    /* Form specific colors */
+    --form-bg: #ffffff;
+    --form-text: #1e293b;
+    --form-border: #e2e8f0;
+    --form-placeholder: #64748b;
+    
     /* Glassmorphism effects */
     --glass-bg: rgba(255, 255, 255, 0.08);
     --glass-border: rgba(255, 255, 255, 0.12);
@@ -160,24 +166,190 @@ body::before {
     left: 100%;
 }
 
+/* Modal Styles with Dark Text */
 .glass-modal .modal-content {
-    background: var(--glass-bg);
-    backdrop-filter: var(--backdrop-blur);
-    -webkit-backdrop-filter: var(--backdrop-blur);
-    border: 1px solid var(--glass-border);
+    background: var(--form-bg);
+    border: 1px solid var(--form-border);
     border-radius: var(--radius-lg);
-    box-shadow: var(--glass-shadow);
-    color: var(--light);
+    box-shadow: var(--shadow-xl);
+    color: var(--form-text);
 }
 
 .glass-modal .modal-header {
-    border-bottom: 1px solid var(--glass-border);
-    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--form-border);
+    padding: 1.5rem 1.5rem 1rem;
+    background: var(--form-bg);
+}
+
+.glass-modal .modal-title {
+    color: var(--form-text);
+    font-weight: 700;
+    font-size: 1.25rem;
+}
+
+.glass-modal .modal-body {
+    padding: 1.5rem;
+    background: var(--form-bg);
+    color: var(--form-text);
 }
 
 .glass-modal .modal-footer {
-    border-top: 1px solid var(--glass-border);
-    padding: 1.25rem 1.5rem;
+    border-top: 1px solid var(--form-border);
+    padding: 1rem 1.5rem 1.5rem;
+    background: var(--form-bg);
+}
+
+.glass-modal .btn-close {
+    filter: invert(0.5);
+}
+
+.glass-modal .btn-close:hover {
+    filter: invert(0.3);
+}
+
+/* Form Styles with Dark Text */
+.form-control, .form-select {
+    background: var(--form-bg);
+    border: 1px solid var(--form-border);
+    color: var(--form-text);
+    border-radius: var(--radius-md);
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.form-control:focus, .form-select:focus {
+    background: var(--form-bg);
+    border-color: var(--primary);
+    color: var(--form-text);
+    box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.15);
+    transform: translateY(-2px);
+}
+
+.form-control::placeholder {
+    color: var(--form-placeholder);
+    font-weight: 400;
+}
+
+.form-label {
+    color: var(--form-text);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.form-text {
+    color: var(--form-placeholder) !important;
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+}
+
+.input-group-text {
+    background: var(--form-bg);
+    border: 1px solid var(--form-border);
+    color: var(--form-placeholder);
+    transition: all 0.3s ease;
+}
+
+.input-group:focus-within .input-group-text {
+    border-color: var(--primary);
+    background: var(--form-bg);
+    color: var(--form-text);
+}
+
+/* Modal Form Specific Styles */
+.modal-form-group {
+    margin-bottom: 1.25rem;
+}
+
+.modal-form-group:last-child {
+    margin-bottom: 0;
+}
+
+.modal-form-group .form-control {
+    font-size: 1rem;
+}
+
+.modal-form-group .form-select {
+    cursor: pointer;
+}
+
+/* Textarea specific styles */
+textarea.form-control {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* Select dropdown styling */
+.form-select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='%231e293b' viewBox='0 0 16 16'%3e%3cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 16px 12px;
+}
+
+/* Button Styles */
+.btn {
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.6s ease;
+}
+
+.btn:hover::before {
+    left: 100%;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    box-shadow: var(--shadow-md);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, var(--primary-light), var(--primary));
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+    color: white;
+}
+
+.btn-secondary {
+    background: var(--light-gray);
+    color: var(--form-text);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-secondary:hover {
+    background: var(--medium-gray);
+    transform: translateY(-2px);
+    color: var(--form-text);
+}
+
+.btn-outline-light {
+    background: transparent;
+    border: 1px solid var(--glass-border);
+    color: var(--light);
+}
+
+.btn-outline-light:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--primary);
+    transform: translateY(-3px);
+    color: var(--light);
 }
 
 /* Landing Page Styles */
@@ -463,89 +635,6 @@ body::before {
 
 .fab-btn:active {
     transform: scale(0.95);
-}
-
-/* Form Styles */
-.form-control, .form-select {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid var(--glass-border);
-    color: var(--light);
-    border-radius: var(--radius-md);
-    padding: 0.75rem 1rem;
-    transition: all 0.3s ease;
-}
-
-.form-control:focus, .form-select:focus {
-    background: rgba(255, 255, 255, 0.12);
-    border-color: var(--primary);
-    color: var(--light);
-    box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.25);
-    transform: translateY(-2px);
-}
-
-.form-control::placeholder {
-    color: var(--light-gray);
-}
-
-.input-group-text {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid var(--glass-border);
-    color: var(--light-gray);
-    transition: all 0.3s ease;
-}
-
-.input-group:focus-within .input-group-text {
-    border-color: var(--primary);
-    background: rgba(255, 255, 255, 0.12);
-}
-
-/* Button Styles */
-.btn {
-    border-radius: var(--radius-md);
-    font-weight: 600;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border: none;
-    padding: 0.75rem 1.5rem;
-    position: relative;
-    overflow: hidden;
-}
-
-.btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transition: left 0.6s ease;
-}
-
-.btn:hover::before {
-    left: 100%;
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-    box-shadow: var(--shadow-md);
-}
-
-.btn-primary:hover {
-    background: linear-gradient(135deg, var(--primary-light), var(--primary));
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-lg);
-}
-
-.btn-outline-light {
-    background: transparent;
-    border: 1px solid var(--glass-border);
-    color: var(--light);
-}
-
-.btn-outline-light:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: var(--primary);
-    transform: translateY(-3px);
 }
 
 /* Dashboard Specific Styles */
@@ -1097,6 +1186,15 @@ body::before {
         height: 56px;
         bottom: 80px;
         right: 1rem;
+    }
+    
+    /* Modal mobile adjustments */
+    .glass-modal .modal-dialog {
+        margin: 0.5rem;
+    }
+    
+    .glass-modal .modal-body {
+        padding: 1rem;
     }
 }
 
