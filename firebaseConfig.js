@@ -9,7 +9,13 @@ const firebaseConfig = {
   measurementId: "G-N86451D5QJ"
 };
 
-firebase.initializeApp(firebaseConfig);
+// Initialize Firebase
+const app = firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
 
-const auth = getAuth(app);
-const db = getFirestore(app);
+// Enable offline persistence
+db.enablePersistence()
+  .catch((err) => {
+      console.log('Firebase persistence error: ', err);
+  });
