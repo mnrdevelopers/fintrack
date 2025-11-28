@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinTrack - Smart Finance Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="animations.css">
+    <link rel="stylesheet" href="responsive.css">
+</head>
+<body class="landing-page">
+    <!-- Global Loader -->
+    <div id="globalLoader" class="global-loader">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <h3 class="loader-text mt-4">FinTrack</h3>
+            <p class="loader-subtext">Your Smart Finance Companion</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container-fluid landing-container">
+        <div class="row min-vh-100 align-items-center">
+            <div class="col-lg-6">
+                <div class="landing-content">
+                    <div class="logo-section mb-5">
+                        <i class="fas fa-chart-line fa-3x text-primary mb-3"></i>
+                        <h1 class="display-4 fw-bold text-white">FinTrack</h1>
+                        <p class="lead text-light">Take control of your finances with our premium tracking solution</p>
+                    </div>
+                    
+                    <div class="features-grid">
+                        <div class="feature-card">
+                            <i class="fas fa-wallet feature-icon"></i>
+                            <h4>Expense Tracking</h4>
+                            <p>Track every expense with smart categorization</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-calendar-alt feature-icon"></i>
+                            <h4>EMI Management</h4>
+                            <p>Never miss an EMI payment again</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-chart-pie feature-icon"></i>
+                            <h4>Smart Reports</h4>
+                            <p>Visual insights into your spending habits</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-6">
+                <div class="auth-section">
+                    <div class="auth-card glass-card">
+                        <h2 class="text-center mb-4">Get Started</h2>
+                        <p class="text-center text-muted mb-4">Join thousands managing their finances smarter</p>
+                        
+                        <div class="d-grid gap-3">
+                            <a href="signup.html" class="btn btn-primary btn-lg">
+                                <i class="fas fa-user-plus me-2"></i>Create Account
+                            </a>
+                            <a href="login.html" class="btn btn-outline-light btn-lg">
+                                <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                            </a>
+                        </div>
+                        
+                        <div class="stats-section mt-5">
+                            <div class="row text-center">
+                                <div class="col-4">
+                                    <h4 class="text-white">10K+</h4>
+                                    <small class="text-muted">Users</small>
+                                </div>
+                                <div class="col-4">
+                                    <h4 class="text-white">$5M+</h4>
+                                    <small class="text-muted">Tracked</small>
+                                </div>
+                                <div class="col-4">
+                                    <h4 class="text-white">4.8★</h4>
+                                    <small class="text-muted">Rating</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="js/firebaseConfig.js"></script>
+    <script src="ui.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is already logged in
+            setTimeout(() => {
+                const loader = document.getElementById('globalLoader');
+                if (loader) loader.style.display = 'none';
+            }, 1500);
+        });
+    </script>
+</body>
+</html>
