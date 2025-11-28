@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports - FinTrack</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body class="app-page">
+    <div id="globalLoader" class="global-loader">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <p class="loader-text mt-3">Generating reports...</p>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="app-header">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col">
+                    <div class="d-flex align-items-center">
+                        <a href="dashboard.html" class="btn btn-sm btn-outline-light me-3">
+                            <i class="fas fa-arrow-left"></i>
+                        </a>
+                        <h1 class="h4 mb-0 text-white">Financial Reports</h1>
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle me-2"></i>
+                            <span id="userName">User</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="app-main">
+        <div class="container-fluid">
+            <!-- Period Selector -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="glass-card page-enter">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Select Period</h5>
+                            <select class="form-select form-select-sm" id="reportPeriod" style="width: auto;">
+                                <option value="current-month">Current Month</option>
+                                <option value="last-month">Last Month</option>
+                                <option value="last-3-months">Last 3 Months</option>
+                                <option value="last-6-months">Last 6 Months</option>
+                                <option value="current-year">This Year</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary Stats -->
+            <div class="row mb-4">
+                <div class="col-md-3 col-6 mb-3">
+                    <div class="stat-card glass-card page-enter" style="animation-delay: 0.1s;">
+                        <div class="stat-icon total">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <h3 id="totalSpent" class="skeleton-text">--</h3>
+                        <p>Total Spent</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6 mb-3">
+                    <div class="stat-card glass-card page-enter" style="animation-delay: 0.2s;">
+                        <div class="stat-icon average">
+                            <i class="fas fa-calculator"></i>
+                        </div>
+                        <h3 id="averageDaily" class="skeleton-text">--</h3>
+                        <p>Average/Day</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6 mb-3">
+                    <div class="stat-card glass-card page-enter" style="animation-delay: 0.3s;">
+                        <div class="stat-icon transactions">
+                            <i class="fas fa-receipt"></i>
+                        </div>
+                        <h3 id="totalTransactions" class="skeleton-text">--</h3>
+                        <p>Transactions</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6 mb-3">
+                    <div class="stat-card glass-card page-enter" style="animation-delay: 0.4s;">
+                        <div class="stat-icon highest">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3 id="highestCategory" class="skeleton-text">--</h3>
+                        <p>Top Category</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="row">
+                <div class="col-lg-8 mb-4">
+                    <div class="glass-card page-enter" style="animation-delay: 0.5s;">
+                        <h5 class="mb-4">Monthly Spending Trend</h5>
+                        <div id="monthlyChart" class="chart-container">
+                            <div class="skeleton-chart"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 mb-4">
+                    <div class="glass-card page-enter" style="animation-delay: 0.6s;">
+                        <h5 class="mb-4">Spending by Category</h5>
+                        <div id="categoryChart" class="chart-container">
+                            <div class="skeleton-chart"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category Breakdown -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="glass-card page-enter" style="animation-delay: 0.7s;">
+                        <h5 class="mb-4">Category Breakdown</h5>
+                        <div id="categoryBreakdown" class="category-list">
+                            <!-- Skeleton loaders -->
+                            <div class="skeleton-category"></div>
+                            <div class="skeleton-category"></div>
+                            <div class="skeleton-category"></div>
+                            <div class="skeleton-category"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="dashboard.html" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="expenses.html" class="nav-item">
+            <i class="fas fa-wallet"></i>
+            <span>Expenses</span>
+        </a>
+        <a href="emis.html" class="nav-item">
+            <i class="fas fa-credit-card"></i>
+            <span>EMIs</span>
+        </a>
+        <a href="reports.html" class="nav-item active">
+            <i class="fas fa-chart-pie"></i>
+            <span>Reports</span>
+        </a>
+    </nav>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="firebaseConfig.js"></script>
+    <script type="module" src="auth.js"></script>
+    <script type="module" src="ui.js"></script>
+    <script type="module" src="expenses.js"></script>
+    <script type="module" src="reports.js"></script>
+</body>
+</html>
